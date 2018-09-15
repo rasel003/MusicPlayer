@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class NowPlaying extends AppCompatActivity {
 
@@ -25,9 +27,9 @@ public class NowPlaying extends AppCompatActivity {
     private TextView tvTitle, tvArtist, tvTotalDuration, tvCurrentDuration;
     private SeekBar seekBar = null;
     private static MediaPlayer player = null;
-    private ImageButton prev = null;
-    private ImageButton play = null;
-    private ImageButton next = null;
+    private ImageView prev = null;
+    private ImageView play = null;
+    private ImageView next = null;
     private ImageView imgNowPlayingPoster;
 
     private boolean isStarted = true;
@@ -48,6 +50,11 @@ public class NowPlaying extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Objects.requireNonNull(getSupportActionBar()).setTitle("Now Playing");
+            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        }
 
         tvTitle = findViewById(R.id.tvNowPlayingTitle);
         tvArtist = findViewById(R.id.tvNowPlayingArtist);

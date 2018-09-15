@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private int STORAGE_PERMISSION_CODE = 1;
 
     private ArrayList<SongDetails> songList;
+    private ArrayList<Album> albumList;
 
 
     @Override
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         songList = new ArrayList<>(3);
+        albumList = new ArrayList<>(3);
 
         String selection = MediaStore.Audio.Media.IS_MUSIC + " !=0";
         Cursor cursor = null;
@@ -53,9 +54,32 @@ public class MainActivity extends AppCompatActivity {
                     String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                     String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String uri = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-
                     SongDetails songDetails = new SongDetails(name, artist, uri);
                     songList.add(songDetails);
+
+                    String albumKey = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_KEY));
+                    String albumName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+
+                    if(albumList.size()==0){
+                        Album album = new Album(albumName, artist, albumKey);
+                        album.addSong(songDetails);
+                        albumList.add(album);
+                    }else {
+                        boolean isFound = false;
+                        for (Album album: albumList
+                             ) {
+                            if(album.getAlbumName().trim().toLowerCase().equals(albumName.trim().toLowerCase())){
+                                album.addSong(songDetails);
+                                isFound = true;
+                            }
+                        }
+                        if( ! isFound ){
+                            Album newAlbum = new Album(albumName, artist, albumKey);
+                            newAlbum.addSong(songDetails);
+                            albumList.add(newAlbum);
+                        }
+                    }
+
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -63,15 +87,16 @@ public class MainActivity extends AppCompatActivity {
             bottomNav.setOnNavigationItemSelectedListener(navListener);
 
             if (savedInstanceState == null) {
-                Fragment fragment =new AllSongsFragment();
+                Fragment fragment = new AllSongsFragment();
                 Bundle data = new Bundle();
                 data.putParcelableArrayList("songList", songList);//put string, int, etc in bundle with a key value
-                fragment.setArguments(data);//
+                fragment.setArguments(data);
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer,
                         fragment).commit();
             }
         }
     }
+
     private BottomNavigationView.OnNavigationItemSelectedListener navListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
@@ -81,12 +106,18 @@ public class MainActivity extends AppCompatActivity {
                     switch (item.getItemId()) {
                         case R.id.nav_songs:
                             selectedFragment = new AllSongsFragment();
+                            Bundle data = new Bundle();
+                            data.putParcelableArrayList("songList", songList);
+                            selectedFragment.setArguments(data);
                             break;
                         case R.id.nav_playList:
-                            selectedFragment = new AllSongsFragment();
+
                             break;
                         case R.id.nav_album:
-                            selectedFragment = new AllSongsFragment();
+                            selectedFragment = new AlbumFragment();
+                            Bundle dataAlbum = new Bundle();
+                            dataAlbum.putParcelableArrayList("albumList", albumList);
+                            selectedFragment.setArguments(dataAlbum);
                             break;
                     }
 
