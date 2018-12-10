@@ -110,9 +110,6 @@ public class MainActivity extends AppCompatActivity {
                             data.putParcelableArrayList("songList", songList);
                             selectedFragment.setArguments(data);
                             break;
-                        case R.id.nav_playList:
-
-                            break;
                         case R.id.nav_album:
                             selectedFragment = new AlbumFragment();
                             Bundle dataAlbum = new Bundle();

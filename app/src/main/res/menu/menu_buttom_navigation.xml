@@ -6,12 +6,8 @@
         android:icon="@drawable/ic_music"
         android:title="Songs" />
     <item
-        android:id="@+id/nav_playList"
-        android:icon="@drawable/ic_home"
-        android:title="PlayList" />
-    <item
         android:id="@+id/nav_album"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/album"
         android:title="Album" />
 
 </menu>

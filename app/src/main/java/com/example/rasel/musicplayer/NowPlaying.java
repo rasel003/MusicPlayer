@@ -152,7 +152,7 @@ public class NowPlaying extends AppCompatActivity {
         isStarted = false;
     }
 
-   /*@Override
+
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(updatePositinRunnable);
@@ -160,7 +160,7 @@ public class NowPlaying extends AppCompatActivity {
         player.reset();
         player.release();
         player = null;
-    } */
+    }
 
     private void updatePosition() {
         handler.removeCallbacks(updatePositinRunnable);
