@@ -5,12 +5,12 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class NowPlaying extends AppCompatActivity {
+
+    private static final String TAG = "NowPlaying";
 
     private static final int UPDATE_FREQUENCY = 500;
     private static final int STEP_VALUE = 4000;
@@ -51,10 +53,10 @@ public class NowPlaying extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Objects.requireNonNull(getSupportActionBar()).setTitle("Now Playing");
-            Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        }
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Now Playing");
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         tvTitle = findViewById(R.id.tvNowPlayingTitle);
         tvArtist = findViewById(R.id.tvNowPlayingArtist);
@@ -72,19 +74,19 @@ public class NowPlaying extends AppCompatActivity {
         next.setOnClickListener(OnButtonClick);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle != null) {
+        if (bundle != null) {
             songList = bundle.getParcelableArrayList("songList");
             newPosition = Integer.valueOf(bundle.getString("position"));
-        }else{
-            Log.d("rsl","Now Playing is terminating...");
+        } else {
+            Log.d("rsl", "Now Playing is terminating...");
             finish();
         }
-        if (player == null){
+        if (player == null) {
             player = new MediaPlayer();
             position = newPosition;
             startPlay(position);
-        }else{
-            if(newPosition==position){
+        } else {
+            if (newPosition == position) {
                 tvTitle.setText(songList.get(position).getTitle());
                 tvArtist.setText(songList.get(position).getArtist());
                 seekBar.setProgress(player.getCurrentPosition());
@@ -101,7 +103,7 @@ public class NowPlaying extends AppCompatActivity {
                 updatePosition();
                 isStarted = true;
 
-            }else {
+            } else {
                 position = newPosition;
                 startPlay(position);
             }
@@ -110,6 +112,7 @@ public class NowPlaying extends AppCompatActivity {
         player.setOnErrorListener(onError);
         seekBar.setOnSeekBarChangeListener(seekBarChanged);
     }
+
     private void startPlay(int position) {
 
         tvTitle.setText(songList.get(position).getTitle());
@@ -124,9 +127,15 @@ public class NowPlaying extends AppCompatActivity {
             player.setDataSource(data);
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             mmr.setDataSource(data);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(), 0, mmr.getEmbeddedPicture().length);
+
+            byte[] artBytes = mmr.getEmbeddedPicture();
+            if(artBytes != null) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(artBytes, 0, artBytes.length);
+                imgNowPlayingPoster.setImageBitmap(bitmap);
+            }else {
+                imgNowPlayingPoster.setImageDrawable(getResources().getDrawable(R.drawable.album));
+            }
             mmr.release();
-            imgNowPlayingPoster.setImageBitmap(bitmap);
 
             player.prepare();
             player.start();
@@ -174,6 +183,7 @@ public class NowPlaying extends AppCompatActivity {
         seekBar.setProgress(player.getCurrentPosition());
         handler.postDelayed(updatePositinRunnable, UPDATE_FREQUENCY);
     }
+
     public String milliSecondsToTimer(long milliseconds) {
         String finalTimerString = "";
         String secondsString = "";
@@ -188,7 +198,7 @@ public class NowPlaying extends AppCompatActivity {
 
         if (seconds < 10) {
             secondsString = "0" + seconds;
-        }   else {
+        } else {
             secondsString = "" + seconds;
         }
 
@@ -251,6 +261,7 @@ public class NowPlaying extends AppCompatActivity {
     private MediaPlayer.OnErrorListener onError = new MediaPlayer.OnErrorListener() {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
+            Log.d(TAG, "onError: error occurred");
             return false;
         }
     };

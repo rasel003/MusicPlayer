@@ -9,6 +9,7 @@ public class Album implements Parcelable{
     private String albumName;
     private String albumArtistName;
     private String albumKey;
+
     private ArrayList<SongDetails> songList;
 
     public Album(String albumName, String albumArtistName, String albumKey) {

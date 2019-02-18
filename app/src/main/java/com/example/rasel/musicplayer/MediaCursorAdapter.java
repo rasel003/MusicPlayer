@@ -25,7 +25,6 @@ public class MediaCursorAdapter extends RecyclerView.Adapter<MediaCursorAdapter.
     MediaCursorAdapter(Context context, ArrayList<SongDetails> songList) {
         this.songList = songList;
         this.context = context;
-
     }
 
     @NonNull
@@ -43,9 +42,14 @@ public class MediaCursorAdapter extends RecyclerView.Adapter<MediaCursorAdapter.
         String data = songList.get(position).getUri();
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         mmr.setDataSource(data);
-        Bitmap bitmap = BitmapFactory.decodeByteArray(mmr.getEmbeddedPicture(), 0, mmr.getEmbeddedPicture().length);
+        byte[] artBytes = mmr.getEmbeddedPicture();
+        if(artBytes != null) {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(artBytes, 0, artBytes.length);
+            holder.imSongPoster.setImageBitmap(bitmap);
+        }else {
+            holder.imSongPoster.setImageDrawable(context.getResources().getDrawable(R.drawable.album));
+        }
         mmr.release();
-        holder.imSongPoster.setImageBitmap(bitmap);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override

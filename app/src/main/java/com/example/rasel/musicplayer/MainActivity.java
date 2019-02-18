@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
         songList = new ArrayList<>(3);
         albumList = new ArrayList<>(3);
@@ -79,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                             albumList.add(newAlbum);
                         }
                     }
-
                 } while (cursor.moveToNext());
             }
             cursor.close();
@@ -129,15 +131,15 @@ public class MainActivity extends AppCompatActivity {
 
             new AlertDialog.Builder(this)
                     .setTitle("Permission needed")
-                    .setMessage("This permission is needed to retrive the music files")
-                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                    .setMessage("This permission is needed to retrieve the music files")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             ActivityCompat.requestPermissions(MainActivity.this,
                                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
                         }
                     })
-                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
